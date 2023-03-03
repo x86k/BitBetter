@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 DIR=`dirname "$0"`
 DIR=`exec 2>/dev/null;(cd -- "$DIR") && cd -- "$DIR"|| cd "$DIR"; unset PWD; /usr/bin/pwd || /bin/pwd || pwd`
-BW_VERSION=$(curl -sL https://go.btwrdn.co/bw-sh-versions | grep '^ *"'coreVersion'":' | awk -F\: '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')
+# BW_VERSION=$(curl -sL https://go.btwrdn.co/bw-sh-versions | grep '^ *"'coreVersion'":' | awk -F\: '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')
+BW_VERSION="2023.2.1"
 
 echo "Building BitBetter for BitWarden version $BW_VERSION"
 
@@ -23,6 +24,13 @@ docker tag bitbetter/identity bitbetter/identity:latest
 docker tag bitbetter/api bitbetter/api:$BW_VERSION
 docker tag bitbetter/identity bitbetter/identity:$BW_VERSION
 
-# Remove old instances of the image after a successful build.
-ids=$( docker images bitbetter/* | grep -E -v -- "CREATED|latest|${BW_VERSION}" | awk '{ print $3 }' )
-[ -n "$ids" ] && docker rmi $ids || true
+# # Remove old instances of the image after a successful build.
+# ids=$( docker images bitbetter/* | grep -E -v -- "CREATED|latest|${BW_VERSION}" | awk '{ print $3 }' )
+# [ -n "$ids" ] && docker rmi $ids || true
+
+echo "Saving artifacts..."
+mkdir -p "$DIR/artifacts"
+# Save built dockers for upload as artifacts
+docker save bitbetter/api:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_api.tar.gz"
+docker save bitbetter/identity:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_identity.tar.gz"
+echo "bw_version=$BW_VERSION" >> $GITHUB_ENV

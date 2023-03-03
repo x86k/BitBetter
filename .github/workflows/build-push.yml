@@ -1,0 +1,60 @@
+name: Build and push to GitHub Container Registry
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Build-and-Push:
+    name: Build a patched Bitwarden image and push to a registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Running on ${{ runner.os }}"
+      - run: echo "Branch is ${{ github.ref }}"
+      - run: echo "Repository is ${{ github.repository }}"
+
+      - name: Checkout master
+        uses: actions/checkout@v3
+
+      - name: Generate or retrieve custom license key
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
+          KEY_BASE64: ${{ secrets.KEY_BASE64 }}
+        run: |
+          ./.keys/generate-keys.sh
+        shell: bash
+
+      - name: Show certificate information
+        run: |
+          openssl x509 -in ./.keys/cert.cert -inform DER -text -noout
+
+      - name: Patch Bitwarden images
+        run: |
+          ./build.sh
+        shell: bash
+
+      - name: Upload built images as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: "bitbetter-${{ env.bw_version }}"
+          path: |
+            artifacts/bitbetter_api.tar.gz
+            artifacts/bitbetter_identity.tar.gz
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Re-tag images for upload to GitHub Container Registry
+        run: |
+          docker tag bitbetter/api:${{ env.bw_version }} ghcr.io/${{ github.actor }}/bitbetter/api:${{ env.bw_version }}
+          docker tag bitbetter/identity:${{ env.bw_version }} ghcr.io/${{ github.actor }}/bitbetter/identity:${{ env.bw_version }}
+
+      - name: Push images to GitHub Container Registry
+        run: |
+          docker push ghcr.io/${{ github.actor }}/bitbetter/api:${{ env.bw_version }}
+          docker push ghcr.io/${{ github.actor }}/bitbetter/identity:${{ env.bw_version }}

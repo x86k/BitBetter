@@ -18,19 +18,23 @@ docker run --rm -v "$DIR/src/bitBetter:/bitBetter" -w=/bitBetter mcr.microsoft.c
 
 docker build --no-cache --build-arg BITWARDEN_TAG=bitwarden/api:$BW_VERSION --label com.bitwarden.product="bitbetter" -t bitbetter/api "$DIR/src/bitBetter" # --squash
 docker build --no-cache --build-arg BITWARDEN_TAG=bitwarden/identity:$BW_VERSION --label com.bitwarden.product="bitbetter" -t bitbetter/identity "$DIR/src/bitBetter" # --squash
+docker build --no-cache -t bitbetter/licensegen "$DIR/src/licenseGen" # --squash
 
 docker tag bitbetter/api bitbetter/api:latest
 docker tag bitbetter/identity bitbetter/identity:latest
 docker tag bitbetter/api bitbetter/api:$BW_VERSION
 docker tag bitbetter/identity bitbetter/identity:$BW_VERSION
 
+docker tag bitbetter/licensegen bitbetter/licensegen:latest
+docker tag bitbetter/licensegen bitbetter/licensegen:0.1
+
 # # Remove old instances of the image after a successful build.
 # ids=$( docker images bitbetter/* | grep -E -v -- "CREATED|latest|${BW_VERSION}" | awk '{ print $3 }' )
 # [ -n "$ids" ] && docker rmi $ids || true
 
-echo "Saving artifacts..."
-mkdir -p "$DIR/artifacts"
-# Save built dockers for upload as artifacts
-docker save bitbetter/api:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_api.tar.gz"
-docker save bitbetter/identity:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_identity.tar.gz"
-echo "bw_version=$BW_VERSION" >> $GITHUB_ENV
+# echo "Saving artifacts..."
+# mkdir -p "$DIR/artifacts"
+# # Save built dockers for upload as artifacts
+# docker save bitbetter/api:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_api.tar.gz"
+# docker save bitbetter/identity:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_identity.tar.gz"
+# echo "bw_version=$BW_VERSION" >> $GITHUB_ENV

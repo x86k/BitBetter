@@ -37,4 +37,4 @@ docker tag bitbetter/licensegen bitbetter/licensegen:0.1
 # # Save built dockers for upload as artifacts
 # docker save bitbetter/api:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_api.tar.gz"
 # docker save bitbetter/identity:$BW_VERSION | gzip > "$DIR/artifacts/bitbetter_identity.tar.gz"
-# echo "bw_version=$BW_VERSION" >> $GITHUB_ENV
+echo "bw_version=$BW_VERSION" >> $GITHUB_ENV

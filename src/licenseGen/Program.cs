@@ -414,9 +414,9 @@ namespace bitwardenSelfLicensor
             set("BillingEmail", email);
             set("BusinessName", string.IsNullOrWhiteSpace(businessName) ? "BitBetter" : businessName);
             set("Enabled", true);
-            set("Plan", "Custom");
-            set("PlanType", Enum.Parse(planTypeEnum, "Custom"));
-            set("Seats", (int)short.MaxValue);
+            set("Plan", "Enterprise (Annually)");
+            set("PlanType", Enum.Parse(planTypeEnum, "EnterpriseAnnually"));
+            set("Seats", int.MaxValue);
             set("MaxCollections", short.MaxValue);
             set("UsePolicies", true);
             set("UseSso", true);
@@ -433,12 +433,17 @@ namespace bitwardenSelfLicensor
             set("MaxStorageGb", storage == 0 ? short.MaxValue : storage);
             set("SelfHost", true);
             set("UsersGetPremium", true);
-            set("Version", 10);
+            set("UsePasswordManager", true);
+            set("UseSecretsManager", true);
+            set("SmSeats", int.MaxValue);
+            set("SmServiceAccounts", int.MaxValue);
+            set("Version", 14); //This is set to 14 to use LimitCollectionCreationDeletion can be changed to 13 to just use Secrets Manager
             set("Issued", DateTime.UtcNow);
             set("Refresh", DateTime.UtcNow.AddYears(100).AddMonths(-1));
             set("Expires", DateTime.UtcNow.AddYears(100));
             set("Trial", false);
             set("LicenseType", Enum.Parse(licenseTypeEnum, "Organization"));
+            set("LimitCollectionCreationDeletion", true); //This will be used in the new version of BitWarden but can be applied now
 
             set("Hash", Convert.ToBase64String((byte[])type.GetMethod("ComputeHash").Invoke(license, new object[0])));
             set("Signature", Convert.ToBase64String((byte[])type.GetMethod("Sign").Invoke(license, new object[] { cert })));

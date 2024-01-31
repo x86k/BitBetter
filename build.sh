@@ -3,7 +3,7 @@
 DIR=`dirname "$0"`
 DIR=`exec 2>/dev/null;(cd -- "$DIR") && cd -- "$DIR"|| cd "$DIR"; unset PWD; /usr/bin/pwd || /bin/pwd || pwd`
 # BW_VERSION=$(curl -sL https://go.btwrdn.co/bw-sh-versions | grep '^ *"'coreVersion'":' | awk -F\: '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//')
-BW_VERSION="2023.12.0"
+BW_VERSION="2024.1.2"
 
 echo "Building BitBetter for BitWarden version $BW_VERSION"
 
